@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALPHA LOGISTICS — Internal Dispatch Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #0c0c0e;
+  --bg2:      #131316;
+  --bg3:      #1c1c22;
+  --bg4:      #242430;
+  --border:   rgba(255,255,255,0.07);
+  --border2:  rgba(255,255,255,0.13);
+  --border3:  rgba(255,255,255,0.2);
+  --accent:   #f97316;
+  --accent2:  #fb923c;
+  --accentL:  rgba(249,115,22,0.12);
+  --accentG:  rgba(249,115,22,0.06);
+  --blue:     #38bdf8;
+  --blueL:    rgba(56,189,248,0.1);
+  --green:    #4ade80;
+  --greenL:   rgba(74,222,128,0.1);
+  --yellow:   #facc15;
+  --yellowL:  rgba(250,204,21,0.1);
+  --red:      #f87171;
+  --redL:     rgba(248,113,113,0.1);
+  --purple:   #a78bfa;
+  --text:     #f1f1f3;
+  --text2:    #a1a1aa;
+  --text3:    #52525b;
+  --sidebar:  200px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;line-height:1.6;overflow-x:hidden;min-height:100vh}
+
+/* ─── SCROLLBAR ─────────────────────────────────────── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+
+/* ─── LAYOUT ─────────────────────────────────────────── */
+.app{display:flex;min-height:100vh}
+
+/* ─── SIDEBAR ────────────────────────────────────────── */
+.sidebar{width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:200;transition:transform .3s}
+.sidebar-logo{padding:20px 16px 16px;border-bottom:1px solid var(--border)}
+.logo-mark{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#000;font-family:'Bebas Neue',sans-serif;letter-spacing:0;flex-shrink:0}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--text);line-height:1}
+.logo-sub{font-size:9px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-top:1px}
+.sidebar-nav{flex:1;padding:12px 8px;overflow-y:auto}
+.nav-section{margin-bottom:20px}
+.nav-section-label{font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text3);padding:0 8px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;transition:all .15s;text-decoration:none;white-space:nowrap;position:relative}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--accentL);color:var(--accent)}
+.nav-item.active::before{content:'';position:absolute;left:0;top:4px;bottom:4px;width:3px;background:var(--accent);border-radius:0 2px 2px 0}
+.nav-icon{width:16px;height:16px;flex-shrink:0;opacity:.7}
+.nav-item.active .nav-icon,.nav-item:hover .nav-icon{opacity:1}
+.nav-badge{margin-left:auto;background:var(--accent);color:#000;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;min-width:18px;text-align:center}
+.sidebar-footer{padding:12px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;background:var(--bg3)}
+.user-ava{width:30px;height:30px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#000;flex-shrink:0}
+.user-info{min-width:0}
+.user-name{font-size:12px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-role{font-size:10px;color:var(--text3)}
+
+/* ─── MAIN ──────────────────────────────────────────── */
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* ─── TOPBAR ─────────────────────────────────────────── */
+.topbar{position:sticky;top:0;z-index:100;background:rgba(12,12,14,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;gap:16px}
+.topbar-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--text)}
+.topbar-breadcrumb{font-size:12px;color:var(--text3);margin-left:4px}
+.topbar-search{flex:1;max-width:320px;margin:0 auto;position:relative}
+.topbar-search input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 12px 6px 32px;color:var(--text);font-size:13px;font-family:'Outfit',sans-serif;outline:none}
+.topbar-search input:focus{border-color:var(--border2)}
+.topbar-search input::placeholder{color:var(--text3)}
+.topbar-search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);width:14px;height:14px}
+.topbar-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.topbar-btn{width:32px;height:32px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);transition:all .15s}
+.topbar-btn:hover{background:var(--bg4);color:var(--text)}
+.notif-dot{width:6px;height:6px;background:var(--accent);border-radius:50%;position:absolute;top:6px;right:6px}
+
+/* ─── PAGE CONTENT ───────────────────────────────────── */
+.page{padding:24px;display:none;animation:fadeIn .2s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── PAGE HEADER ────────────────────────────────────── */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
+.page-header-left{}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--text);line-height:1}
+.page-sub{font-size:13px;color:var(--text2);margin-top:4px}
+.page-actions{display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap}
+
+/* ─── BUTTONS ────────────────────────────────────────── */
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;border:none;display:inline-flex;align-items:center;gap:7px;font-family:'Outfit',sans-serif;text-decoration:none;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#000}
+.btn-primary:hover{background:var(--accent2);transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.btn-outline:hover{background:var(--bg3);color:var(--text);border-color:var(--border3)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid transparent}
+.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-danger{background:var(--redL);color:var(--red);border:1px solid rgba(248,113,113,0.2)}
+.btn-danger:hover{background:rgba(248,113,113,0.2)}
+.btn-success{background:var(--greenL);color:var(--green);border:1px solid rgba(74,222,128,0.2)}
+.btn-success:hover{background:rgba(74,222,128,0.2)}
+
+/* ─── STATS ROW ──────────────────────────────────────── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px 20px;position:relative;overflow:hidden;transition:border-color .2s}
+.stat-card:hover{border-color:var(--border2)}
+.stat-card::after{content:'';position:absolute;top:0;right:0;width:60px;height:60px;border-radius:50%;background:currentColor;opacity:.04;transform:translate(20px,-20px)}
+.stat-label{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--text2);margin-bottom:8px}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1px;color:var(--text);line-height:1}
+.stat-delta{font-size:11px;margin-top:4px;display:flex;align-items:center;gap:4px}
+.delta-up{color:var(--green)}
+.delta-dn{color:var(--red)}
+.stat-icon{position:absolute;top:16px;right:16px;width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px}
+
+/* ─── CARDS & PANELS ─────────────────────────────────── */
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:12px}
+.panel-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.panel-title{font-size:14px;font-weight:600;color:var(--text)}
+.panel-body{padding:20px}
+
+/* ─── TABLE ──────────────────────────────────────────── */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{text-align:left;padding:10px 14px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border);transition:background .12s;cursor:pointer}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--bg3)}
+tbody td{padding:11px 14px;color:var(--text);vertical-align:middle}
+.td-mono{font-family:'JetBrains Mono',monospace;font-size:12px}
+.td-muted{color:var(--text2)}
+
+/* ─── BADGES ─────────────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid;white-space:nowrap}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.badge-green{color:var(--green);background:var(--greenL);border-color:rgba(74,222,128,0.2)}
+.badge-orange{color:var(--accent);background:var(--accentL);border-color:rgba(249,115,22,0.2)}
+.badge-blue{color:var(--blue);background:var(--blueL);border-color:rgba(56,189,248,0.2)}
+.badge-red{color:var(--red);background:var(--redL);border-color:rgba(248,113,113,0.2)}
+.badge-yellow{color:var(--yellow);background:var(--yellowL);border-color:rgba(250,204,21,0.2)}
+.badge-purple{color:var(--purple);background:rgba(167,139,250,0.1);border-color:rgba(167,139,250,0.2)}
+.badge-gray{color:var(--text2);background:var(--bg4);border-color:var(--border)}
+
+/* ─── FORM FIELDS ────────────────────────────────────── */
+.field-group{display:flex;flex-direction:column;gap:5px}
+.field-label{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--text2)}
+.field-input,.field-select,.field-textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;font-family:'Outfit',sans-serif;outline:none;transition:border-color .15s;width:100%}
+.field-input:focus,.field-select:focus,.field-textarea:focus{border-color:var(--accent)}
+.field-input::placeholder{color:var(--text3)}
+.field-select{cursor:pointer}
+.field-textarea{resize:vertical;min-height:80px}
+
+/* ─── FILTERS BAR ────────────────────────────────────── */
+.filters-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.filter-select{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text2);font-size:12px;font-family:'Outfit',sans-serif;outline:none;cursor:pointer}
+.filter-select:focus{border-color:var(--border2)}
+.search-input{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--text);font-size:13px;font-family:'Outfit',sans-serif;outline:none;flex:1;min-width:180px}
+.search-input:focus{border-color:var(--border2)}
+.search-input::placeholder{color:var(--text3)}
+
+/* ─── LOAD CARD (freight board) ──────────────────────── */
+.loads-grid{display:flex;flex-direction:column;gap:8px}
+.load-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px 20px;transition:all .2s;cursor:pointer;position:relative;overflow:hidden}
+.load-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--border2);transition:background .2s}
+.load-card:hover{border-color:var(--border2);transform:translateX(2px)}
+.load-card:hover::before,.load-card.pinned::before{background:var(--accent)}
+.load-card.pinned{border-color:rgba(249,115,22,0.2)}
+.load-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.load-route{font-size:15px;font-weight:600}
+.load-route .arrow{color:var(--accent);margin:0 6px}
+.load-price{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;color:var(--accent);white-space:nowrap}
+.load-price.negotiable{color:var(--text2);font-size:13px}
+.load-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.load-actions{display:flex;gap:6px;margin-top:12px}
+.load-actions .btn{padding:4px 10px;font-size:11px}
+.pin-btn{background:none;border:none;cursor:pointer;color:var(--text3);transition:color .15s;padding:2px}
+.pin-btn:hover,.pin-btn.active{color:var(--accent)}
+.load-source{position:absolute;top:10px;right:14px;font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:4px}
+.src-fafa{background:rgba(249,115,22,0.1);color:var(--accent);border:1px solid rgba(249,115,22,0.2)}
+.src-della{background:var(--blueL);color:var(--blue);border:1px solid rgba(56,189,248,0.2)}
+.src-atisu{background:var(--greenL);color:var(--green);border:1px solid rgba(74,222,128,0.2)}
+.src-lardi{background:rgba(167,139,250,0.1);color:var(--purple);border:1px solid rgba(167,139,250,0.2)}
+
+/* ─── CALC ───────────────────────────────────────────── */
+.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.calc-result-big{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:2px;color:var(--accent);line-height:1}
+.calc-range{font-size:13px;color:var(--text2);margin-top:4px}
+.breakdown-item{display:flex;justify-content:space-between;padding:9px 12px;background:var(--bg);border-radius:6px;font-size:13px}
+.breakdown-item:nth-child(even){background:var(--bg3)}
+.breakdown-item .lbl{color:var(--text2)}
+.breakdown-item .val{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text)}
+.breakdown-item.total{border-top:1px solid var(--border2);margin-top:4px;padding-top:12px}
+.breakdown-item.total .val{color:var(--accent);font-size:14px}
+.fuel-bar{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-top:6px}
+.fuel-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--accent));border-radius:3px;transition:width .5s ease}
+
+/* ─── PLATFORMS GRID ─────────────────────────────────── */
+.platforms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.platform-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px;transition:all .2s;display:flex;flex-direction:column;gap:12px}
+.platform-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.platform-header{display:flex;align-items:center;gap:12px}
+.platform-logo{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;font-weight:900;flex-shrink:0}
+.platform-name{font-size:15px;font-weight:700;color:var(--text)}
+.platform-url{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text3);margin-top:1px}
+.platform-desc{font-size:12px;color:var(--text2);flex:1;line-height:1.5}
+.platform-footer{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.platform-cat{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--text3)}
+
+/* ─── TOAST ──────────────────────────────────────────── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:10px 16px;font-size:13px;z-index:999;transform:translateY(20px);opacity:0;transition:all .25s;pointer-events:none;max-width:300px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast-success{border-color:rgba(74,222,128,0.3);color:var(--green)}
+.toast-error{border-color:rgba(248,113,113,0.3);color:var(--red)}
+
+/* ─── MODAL ──────────────────────────────────────────── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(4px)}
+.modal-bg.open{opacity:1;pointer-events:all}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;transform:scale(.96);transition:transform .2s}
+.modal-bg.open .modal{transform:scale(1)}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:16px;font-weight:700}
+.modal-close{width:28px;height:28px;border-radius:6px;background:var(--bg3);border:none;cursor:pointer;color:var(--text2);display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .15s}
+.modal-close:hover{background:var(--bg4);color:var(--text)}
+.modal-body{padding:24px}
+.modal-form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.modal-form-row.single{grid-template-columns:1fr}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+
+/* ─── DRIVER / VEHICLE CARD ──────────────────────────── */
+.driver-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.driver-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;transition:all .2s;cursor:pointer}
+.driver-card:hover{border-color:var(--border2)}
+.driver-ava{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;margin-bottom:10px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px}
+.driver-name{font-size:14px;font-weight:600;margin-bottom:2px}
+.driver-phone{font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text2);margin-bottom:8px}
+.driver-actions{display:flex;gap:6px}
+
+/* ─── QUICK ACTIONS ──────────────────────────────────── */
+.quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+.quick-action{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .2s;text-align:center}
+.quick-action:hover{border-color:var(--border2);background:var(--bg3);transform:translateY(-2px)}
+.qa-icon{font-size:22px;margin-bottom:6px}
+.qa-label{font-size:11px;font-weight:600;color:var(--text2)}
+
+/* ─── ACTIVITY FEED ──────────────────────────────────── */
+.activity-feed{display:flex;flex-direction:column;gap:0}
+.activity-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);position:relative}
+.activity-item:last-child{border-bottom:none}
+.activity-dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0}
+.activity-content{flex:1}
+.activity-text{font-size:13px;color:var(--text)}
+.activity-time{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-top:1px}
+
+/* ─── LOADING SPINNER ────────────────────────────────── */
+.spinner{width:18px;height:18px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ─── EMPTY STATE ────────────────────────────────────── */
+.empty{text-align:center;padding:60px 24px;color:var(--text3)}
+.empty-icon{font-size:36px;margin-bottom:12px;opacity:.5}
+.empty-text{font-size:14px}
+
+/* ─── DIVIDER ────────────────────────────────────────── */
+.divider{height:1px;background:var(--border);margin:16px 0}
+
+/* ─── RANGE SLIDER ───────────────────────────────────── */
+input[type=range]{accent-color:var(--accent);cursor:pointer;width:100%}
+
+/* ─── INFO BOX ───────────────────────────────────────── */
+.info-box{padding:12px 16px;border-radius:8px;font-size:12px;line-height:1.5}
+.info-box-warn{background:var(--yellowL);border:1px solid rgba(250,204,21,0.2);color:var(--yellow)}
+.info-box-info{background:var(--blueL);border:1px solid rgba(56,189,248,0.2);color:var(--blue)}
+
+/* ─── FOOTER ─────────────────────────────────────────── */
+.main-footer{padding:16px 24px;border-top:1px solid var(--border);font-size:11px;color:var(--text3);display:flex;align-items:center;justify-content:space-between;margin-top:auto}
+
+/* ─── HAMBURGER (mobile) ─────────────────────────────── */
+.hamburger{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:4px;width:32px;height:32px;align-items:center;justify-content:center;background:var(--bg3);border:1px solid var(--border);border-radius:8px}
+.hamburger span{width:16px;height:2px;background:var(--text2);border-radius:1px;transition:all .2s}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:199;backdrop-filter:blur(2px)}
+
+/* ─── RESPONSIVE ─────────────────────────────────────── */
+@media(max-width:900px){
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .calc-grid{grid-template-columns:1fr}
+  .platforms-grid{grid-template-columns:repeat(2,1fr)}
+  .driver-grid{grid-template-columns:repeat(2,1fr)}
+  .quick-actions{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:680px){
+  :root{--sidebar:0px}
+  .sidebar{transform:translateX(-200px);width:200px}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay.open{display:block}
+  .main{margin-left:0}
+  .hamburger{display:flex}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .platforms-grid{grid-template-columns:1fr}
+  .driver-grid{grid-template-columns:1fr}
+  .quick-actions{grid-template-columns:repeat(2,1fr)}
+  .modal-form-row{grid-template-columns:1fr}
+  .page{padding:16px}
+  .topbar{padding:0 14px}
+}
+@media(max-width:400px){
+  .stats-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ───────────────────────────────────────────────── -->
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <a class="logo-mark" href="#">
+      <div class="logo-icon">A</div>
+      <div>
+        <div class="logo-text">ALPHA</div>
+        <div class="logo-sub">Logistics</div>
+      </div>
+    </a>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-label">Главное</div>
+      <a class="nav-item active" onclick="showPage('dashboard')" href="#">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+        Дашборд
+      </a>
+      <a class="nav-item" onclick="showPage('loads')" href="#">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M4 3V2.5a.5.5 0 011 0V3M11 3V2.5a.5.5 0 011 0V3"/><line x1="1" y1="6" x2="15" y2="6"/></svg>
+        Биржа грузов
+        <span class="nav-badge" id="loads-count">12</span>
+      </a>
+      <a class="nav-item" onclick="showPage('calc')" href="#">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="1" width="12" height="14" rx="1.5"/><line x1="5" y1="5" x2="11" y2="5"/><line x1="5" y1="8" x2="11" y2="8"/><line x1="5" y1="11" x2="9" y2="11"/></svg>
+        Калькулятор
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-label">Управление</div>
+      <a class="nav-item" onclick="showPage('vehicles')" href="#">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 10V7l2-4h8l2 4v3"/><line x1="1" y1="10" x2="15" y2="10"/><circle cx="4" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/></svg>
+        Транспорт
+      </a>
+      <a class="nav-item" onclick="showPage('drivers')" href="#">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6"/></svg>
+        Водители
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-label">Инструменты</div>
+      <a class="nav-item" onclick="showPage('platforms')" href="#">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M8 1.5C6 4 5 6 5 8s1 4 3 6.5M8 1.5C10 4 11 6 11 8s-1 4-3 6.5"/><line x1="1.5" y1="8" x2="14.5" y2="8"/></svg>
+        Площадки
+      </a>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-ava">Д</div>
+      <div class="user-info">
+        <div class="user-name">Диас Рахитов</div>
+        <div class="user-role">Диспетчер</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── MAIN ──────────────────────────────────────────────────── -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <button class="hamburger" onclick="toggleSidebar()" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="topbar-search">
+      <svg class="topbar-search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4.5"/><line x1="10" y1="10" x2="14" y2="14"/></svg>
+      <input placeholder="Поиск грузов, маршрутов..." id="globalSearch" oninput="globalSearchFn()" autocomplete="off">
+    </div>
+    <div class="topbar-actions">
+      <div class="topbar-btn" title="Уведомления" style="position:relative" onclick="showToast('Нет новых уведомлений','')">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.5a5 5 0 015 5v2l1.5 2.5H1.5L3 8.5v-2a5 5 0 015-5z"/><path d="M6.5 13a1.5 1.5 0 003 0"/></svg>
+      </div>
+      <div class="topbar-btn" title="Добавить груз" onclick="openAddModal()">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: DASHBOARD ════════════════════════════════════════ -->
+  <div class="page active" id="page-dashboard">
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-title">Дашборд</div>
+        <div class="page-sub">Добро пожаловать, Диас · <span id="today-date"></span></div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-outline btn-sm" onclick="showPage('loads')">Биржа грузов</button>
+        <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Добавить груз</button>
+      </div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="quick-actions">
+      <div class="quick-action" onclick="showPage('loads')">
+        <div class="qa-icon">📦</div>
+        <div class="qa-label">Поиск груза</div>
+      </div>
+      <div class="quick-action" onclick="showPage('calc')">
+        <div class="qa-icon">🧮</div>
+        <div class="qa-label">Калькулятор</div>
+      </div>
+      <div class="quick-action" onclick="showPage('drivers')">
+        <div class="qa-icon">🚛</div>
+        <div class="qa-label">Водители</div>
+      </div>
+      <div class="quick-action" onclick="showPage('platforms')">
+        <div class="qa-icon">🌐</div>
+        <div class="qa-label">Площадки</div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card" style="color:var(--accent)">
+        <div class="stat-icon" style="background:var(--accentL)">📦</div>
+        <div class="stat-label">Активных грузов</div>
+        <div class="stat-val">24</div>
+        <div class="stat-delta delta-up">↑ +3 за сегодня</div>
+      </div>
+      <div class="stat-card" style="color:var(--green)">
+        <div class="stat-icon" style="background:var(--greenL)">🚛</div>
+        <div class="stat-label">Транспорт в рейсе</div>
+        <div class="stat-val">7</div>
+        <div class="stat-delta delta-up">↑ 2 выехали сегодня</div>
+      </div>
+      <div class="stat-card" style="color:var(--blue)">
+        <div class="stat-icon" style="background:var(--blueL)">👤</div>
+        <div class="stat-label">Водителей онлайн</div>
+        <div class="stat-val">11</div>
+        <div class="stat-delta" style="color:var(--text3)">— без изменений</div>
+      </div>
+      <div class="stat-card" style="color:var(--yellow)">
+        <div class="stat-icon" style="background:var(--yellowL)">💰</div>
+        <div class="stat-label">Выручка за месяц</div>
+        <div class="stat-val">4.2М</div>
+        <div class="stat-delta delta-up">↑ +12% к пред. месяцу</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 360px;gap:16px">
+      <!-- ACTIVE LOADS -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Активные рейсы</div>
+          <button class="btn btn-ghost btn-sm" onclick="showPage('loads')">Все →</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Маршрут</th>
+                <th>Груз</th>
+                <th>Водитель</th>
+                <th>Статус</th>
+                <th>Цена</th>
+              </tr>
+            </thead>
+            <tbody id="dash-loads-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ACTIVITY -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Последние события</div>
+        </div>
+        <div class="panel-body" style="padding:12px 16px">
+          <div class="activity-feed" id="activity-feed"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: LOADS ════════════════════════════════════════════ -->
+  <div class="page" id="page-loads">
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-title">Биржа грузов</div>
+        <div class="page-sub">Поиск и управление грузами</div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-outline btn-sm" onclick="showPage('platforms')">Открыть площадки</button>
+        <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Добавить груз</button>
+      </div>
+    </div>
+
+    <!-- SEARCH PANEL -->
+    <div class="panel" style="margin-bottom:16px">
+      <div class="panel-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;margin-bottom:12px" class="search-grid">
+          <div class="field-group">
+            <label class="field-label">Откуда</label>
+            <input class="field-input" id="fromCity" placeholder="Астана, Алматы..." list="cities-list" autocomplete="off">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Куда</label>
+            <input class="field-input" id="toCity" placeholder="Шымкент, Актобе..." list="cities-list" autocomplete="off">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <label class="field-label">&nbsp;</label>
+            <button class="btn btn-primary" id="searchBtn" onclick="doSearch()" style="height:38px">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6.5" cy="6.5" r="4.5"/><line x1="10" y1="10" x2="14" y2="14"/></svg>
+              Найти
+            </button>
+          </div>
+        </div>
+        <datalist id="cities-list">
+          <option value="Астана"><option value="Алматы"><option value="Шымкент"><option value="Актобе">
+          <option value="Актау"><option value="Атырау"><option value="Павлодар"><option value="Усть-Каменогорск">
+          <option value="Семей"><option value="Тараз"><option value="Кокшетау"><option value="Петропавловск">
+          <option value="Костанай"><option value="Уральск"><option value="Темиртау"><option value="Жезказган">
+          <option value="Кызылорда"><option value="Экибастуз"><option value="Рудный"><option value="Туркестан">
+          <option value="Балхаш"><option value="Жанаозен"><option value="Талдыкорган"><option value="Степногорск">
+        </datalist>
+        <div class="filters-bar">
+          <span style="font-size:12px;color:var(--text3);margin-right:4px">Площадки:</span>
+          <span class="badge badge-orange" style="cursor:pointer" data-site="fafa" onclick="toggleSiteFilter(this)">FAFA.kz ✓</span>
+          <span class="badge badge-blue" style="cursor:pointer" data-site="della" onclick="toggleSiteFilter(this)">DELLA.kz ✓</span>
+          <span class="badge badge-green" style="cursor:pointer" data-site="atisu" onclick="toggleSiteFilter(this)">ATISU.kz ✓</span>
+          <span class="badge badge-purple" style="cursor:pointer" data-site="lardi" onclick="toggleSiteFilter(this)">Lardi-Trans ✓</span>
+          <div style="margin-left:auto;display:flex;gap:8px">
+            <select class="filter-select" id="filterBody">
+              <option value="">Любой тип</option>
+              <option>Тент</option>
+              <option>Рефрижератор</option>
+              <option>Контейнер</option>
+              <option>Бортовой</option>
+              <option>Мега</option>
+              <option>Джамбо</option>
+              <option>Тралл</option>
+            </select>
+            <select class="filter-select" id="filterTonn">
+              <option value="">Любой тоннаж</option>
+              <option value="1-5">1–5 т</option>
+              <option value="5-10">5–10 т</option>
+              <option value="10-20">10–20 т</option>
+              <option value="20-40">20–40 т</option>
+            </select>
+            <select class="filter-select" id="sortLoads">
+              <option value="price-asc">Цена ↑</option>
+              <option value="price-desc">Цена ↓</option>
+              <option value="date">Дата загрузки</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="results-wrap">
+      <div class="empty">
+        <div class="empty-icon">🔍</div>
+        <div class="empty-text">Введи маршрут и нажми «Найти»</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: CALCULATOR ═══════════════════════════════════════ -->
+  <div class="page" id="page-calc">
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-title">Калькулятор цены</div>
+        <div class="page-sub">Реалистичный расчёт стоимости перевозки</div>
+      </div>
+    </div>
+
+    <div class="calc-grid">
+      <!-- LEFT: INPUTS -->
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">Параметры рейса</div></div>
+        <div class="panel-body" style="display:flex;flex-direction:column;gap:14px">
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="field-group">
+              <label class="field-label">Откуда</label>
+              <input class="field-input" id="cFrom" placeholder="Астана" list="cities-list" oninput="calcPrice()" autocomplete="off">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Куда</label>
+              <input class="field-input" id="cTo" placeholder="Алматы" list="cities-list" oninput="calcPrice()" autocomplete="off">
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Популярные маршруты</label>
+            <select class="field-select" id="quickRoute" onchange="pickRoute()">
+              <option value="">— выбрать из списка —</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Тип кузова / Транспорт</label>
+            <select class="field-select" id="cTruck" onchange="calcPrice()">
+              <option value="tent">Тент / Шторный (до 20т)</option>
+              <option value="mega">Мега-тент (до 24т)</option>
+              <option value="ref">Рефрижератор</option>
+              <option value="lowbed">Тралл / Низкорамник</option>
+              <option value="container">Контейнеровоз</option>
+              <option value="gazelle">Газель (до 3т)</option>
+              <option value="jumbo">Джамбо (до 24т)</option>
+              <option value="flatbed">Платформа / Бортовой</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Тип груза</label>
+            <select class="field-select" id="cCargoType" onchange="calcPrice()">
+              <option value="general">Генеральный (обычный)</option>
+              <option value="food">Продукты питания</option>
+              <option value="construction">Стройматериалы</option>
+              <option value="metal">Металлопрокат</option>
+              <option value="chemicals">Химикаты / Опасный груз</option>
+              <option value="oversized">Негабаритный груз</option>
+              <option value="grain">Зерно / Насыпной</option>
+              <option value="equipment">Оборудование / Техника</option>
+              <option value="auto">Авто / Спецтехника</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Вес груза: <span id="cWeightLabel">10</span> т</label>
+            <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+              <span style="font-size:11px;color:var(--text3)">0.5т</span>
+              <input type="range" id="cWeight" min="0.5" max="40" step="0.5" value="10" oninput="calcPrice()">
+              <span style="font-size:11px;color:var(--text3)">40т</span>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="field-group">
+              <label class="field-label">Срочность</label>
+              <select class="field-select" id="cUrgency" onchange="calcPrice()">
+                <option value="1">Обычная</option>
+                <option value="1.2">Срочная (+20%)</option>
+                <option value="1.4">Очень срочная (+40%)</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Направление</label>
+              <select class="field-select" id="cDirection" onchange="calcPrice()">
+                <option value="1">Попутное</option>
+                <option value="1.15">Встречное (+15%)</option>
+                <option value="0.9">Загруженное (-10%)</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- RIGHT: RESULT -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Результат расчёта</div></div>
+          <div class="panel-body">
+            <div style="margin-bottom:4px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text2)">Стоимость рейса</div>
+            <div class="calc-result-big" id="cTotal">— ₸</div>
+            <div class="calc-range" id="cRange"></div>
+            <div class="divider"></div>
+            <div style="display:flex;flex-direction:column;gap:4px" id="cBreakdown"></div>
+            <div id="cFuelBlock" style="display:none;margin-top:12px">
+              <div style="font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Примерный расход топлива</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                <span id="cFuelLiters" style="font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--text)"></span>
+                <span id="cFuelCost" style="font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--yellow)"></span>
+              </div>
+              <div class="fuel-bar"><div class="fuel-fill" id="cFuelFill" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Дополнительные ставки</div></div>
+          <div class="panel-body" style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="cExtraRates">
+          </div>
+        </div>
+
+        <div class="info-box info-box-info" style="font-size:12px">
+          💡 Цена рассчитана на основе рыночных ставок Казахстана 2024–2025. Итоговая стоимость зависит от переговоров с перевозчиком.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: VEHICLES ═════════════════════════════════════════ -->
+  <div class="page" id="page-vehicles">
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-title">Транспорт</div>
+        <div class="page-sub">Управление парком автомобилей</div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-primary btn-sm" onclick="openVehicleModal()">+ Добавить ТС</button>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Парк транспорта</div>
+        <input class="search-input" style="width:200px;max-width:100%" placeholder="Поиск..." oninput="filterVehicles(this.value)">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Гос. номер</th>
+              <th>Тип</th>
+              <th>Марка</th>
+              <th>Водитель</th>
+              <th>Маршрут</th>
+              <th>Статус</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody id="vehicles-table"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: DRIVERS ══════════════════════════════════════════ -->
+  <div class="page" id="page-drivers">
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-title">Водители</div>
+        <div class="page-sub">Контакты и статусы водителей</div>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-primary btn-sm" onclick="openDriverModal()">+ Добавить водителя</button>
+      </div>
+    </div>
+    <div class="filters-bar" style="margin-bottom:16px">
+      <input class="search-input" placeholder="Поиск водителя..." oninput="filterDrivers(this.value)" style="max-width:240px">
+      <select class="filter-select" id="driverStatusFilter" onchange="filterDrivers()">
+        <option value="">Все статусы</option>
+        <option value="В рейсе">В рейсе</option>
+        <option value="Свободен">Свободен</option>
+        <option value="Отдых">Отдых</option>
+      </select>
+    </div>
+    <div class="driver-grid" id="drivers-grid"></div>
+  </div>
+
+  <!-- ══ PAGE: PLATFORMS ════════════════════════════════════════ -->
+  <div class="page" id="page-platforms">
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-title">Логистические площадки</div>
+        <div class="page-sub">Биржи грузов, карты и инструменты диспетчера</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:24px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:12px">Биржи грузов</div>
+      <div class="platforms-grid" id="platforms-exchanges"></div>
+    </div>
+    <div style="margin-bottom:24px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:12px">Карты и навигация</div>
+      <div class="platforms-grid" id="platforms-maps"></div>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:12px">Объявления и другое</div>
+      <div class="platforms-grid" id="platforms-other"></div>
+    </div>
+  </div>
+
+  <div class="main-footer">
+    <span>ALPHA LOGISTICS — Внутренняя система диспетчерской</span>
+    <span>Разработчик: <strong style="color:var(--text)">Диас Рахитов</strong></span>
+  </div>
+</div>
+
+<!-- ══ MODAL: ADD LOAD ════════════════════════════════════════════ -->
+<div class="modal-bg" id="modal-add-load">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">➕ Добавить груз</div>
+      <button class="modal-close" onclick="closeModal('modal-add-load')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-form-row">
+        <div class="field-group">
+          <label class="field-label">Откуда</label>
+          <input class="field-input" id="m-from" placeholder="Астана" list="cities-list">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Куда</label>
+          <input class="field-input" id="m-to" placeholder="Алматы" list="cities-list">
+        </div>
+      </div>
+      <div class="modal-form-row">
+        <div class="field-group">
+          <label class="field-label">Груз</label>
+          <input class="field-input" id="m-cargo" placeholder="Стройматериалы, продукты...">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Тип кузова</label>
+          <select class="field-select" id="m-body">
+            <option>Тент</option><option>Рефрижератор</option><option>Контейнер</option>
+            <option>Бортовой</option><option>Мега</option><option>Тралл</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-form-row">
+        <div class="field-group">
+          <label class="field-label">Вес (тонн)</label>
+          <input class="field-input" id="m-weight" type="number" placeholder="20" min="0.5" max="60">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Цена (₸)</label>
+          <input class="field-input" id="m-price" type="number" placeholder="650000">
+        </div>
+      </div>
+      <div class="modal-form-row">
+        <div class="field-group">
+          <label class="field-label">Дата загрузки</label>
+          <input class="field-input" id="m-date" type="date">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Контакт (телефон)</label>
+          <input class="field-input" id="m-phone" placeholder="+7 700 000 0000">
+        </div>
+      </div>
+      <div class="modal-form-row single">
+        <div class="field-group">
+          <label class="field-label">Комментарий</label>
+          <textarea class="field-textarea" id="m-comment" placeholder="Дополнительная информация..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-add-load')">Отмена</button>
+      <button class="btn btn-primary" onclick="saveLoad()">Сохранить груз</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: ADD DRIVER ═════════════════════════════════════════ -->
+<div class="modal-bg" id="modal-add-driver">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">👤 Добавить водителя</div>
+      <button class="modal-close" onclick="closeModal('modal-add-driver')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-form-row">
+        <div class="field-group">
+          <label class="field-label">Имя</label>
+          <input class="field-input" id="d-name" placeholder="Иван Петров">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Телефон</label>
+          <input class="field-input" id="d-phone" placeholder="+7 700 000 0000">
+        </div>
+      </div>
+      <div class="modal-form-row">
+        <div class="field-group">
+          <label class="field-label">Тип ТС</label>
+          <select class="field-select" id="d-truck">
+            <option>Тент 20т</option><option>Рефрижератор</option><option>Мега 24т</option>
+            <option>Газель</option><option>Тралл</option><option>Контейнеровоз</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Статус</label>
+          <select class="field-select" id="d-status">
+            <option>Свободен</option><option>В рейсе</option><option>Отдых</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-form-row single">
+        <div class="field-group">
+          <label class="field-label">Текущий маршрут</label>
+          <input class="field-input" id="d-route" placeholder="Астана → Алматы">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-add-driver')">Отмена</button>
+      <button class="btn btn-primary" onclick="saveDriver()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: ADD VEHICLE ════════════════════════════════════════ -->
+<div class="modal-bg" id="modal-add-vehicle">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🚛 Добавить транспорт</div>
+      <button class="modal-close" onclick="closeModal('modal-add-vehicle')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-form-row">
+        <div class="field-group">
+          <label class="field-label">Гос. номер</label>
+          <input class="field-input" id="v-plate" placeholder="111 AAA 01">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Марка</label>
+          <input class="field-input" id="v-brand" placeholder="Volvo FH, MAN TGA...">
+        </div>
+      </div>
+      <div class="modal-form-row">
+        <div class="field-group">
+          <label class="field-label">Тип кузова</label>
+          <select class="field-select" id="v-body">
+            <option>Тент</option><option>Рефрижератор</option><option>Мега</option>
+            <option>Тралл</option><option>Контейнеровоз</option><option>Газель</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Грузоподъёмность (т)</label>
+          <input class="field-input" id="v-cap" type="number" placeholder="20">
+        </div>
+      </div>
+      <div class="modal-form-row single">
+        <div class="field-group">
+          <label class="field-label">Закреплённый водитель</label>
+          <input class="field-input" id="v-driver" placeholder="Имя водителя">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-add-vehicle')">Отмена</button>
+      <button class="btn btn-primary" onclick="saveVehicle()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════════════════════
+
+const ROUTES = {
+  "Астана-Алматы":1300,"Астана-Шымкент":1680,"Астана-Актобе":1110,
+  "Астана-Атырау":1530,"Астана-Павлодар":440,"Астана-Усть-Каменогорск":980,
+  "Астана-Семей":1050,"Астана-Актау":2600,"Астана-Кызылорда":1400,
+  "Астана-Тараз":1600,"Астана-Костанай":480,"Астана-Жезказган":780,
+  "Астана-Петропавловск":320,"Астана-Кокшетау":260,"Астана-Уральск":1620,
+  "Астана-Темиртау":150,"Астана-Экибастуз":350,"Астана-Рудный":620,
+  "Алматы-Шымкент":680,"Алматы-Актобе":2400,"Алматы-Атырау":2800,
+  "Алматы-Павлодар":1700,"Алматы-Усть-Каменогорск":1160,"Алматы-Семей":1160,
+  "Алматы-Актау":3200,"Алматы-Кызылорда":720,"Алматы-Тараз":310,
+  "Алматы-Костанай":1780,"Алматы-Жезказган":1460,"Алматы-Туркестан":550,
+  "Алматы-Талдыкорган":260,"Шымкент-Актобе":2100,"Шымкент-Атырау":2400,
+  "Шымкент-Тараз":370,"Шымкент-Кызылорда":370,"Шымкент-Туркестан":160,
+  "Актобе-Атырау":540,"Актобе-Уральск":550,"Активу-Актау":1600,
+  "Атырау-Актау":480,"Атырау-Уральск":540,"Павлодар-Семей":380,
+  "Павлодар-Усть-Каменогорск":330,"Усть-Каменогорск-Семей":290,
+  "Костанай-Петропавловск":410,"Костанай-Рудный":60,
+};
+
+function getKm(from, to) {
+  return ROUTES[`${from}-${to}`] || ROUTES[`${to}-${from}`] || 0;
+}
+
+let loads = [
+  {id:1,from:'Астана',to:'Алматы',cargo:'Стройматериалы',body:'Тент',weight:20,price:520000,date:'26.01',driver:'Серик Нуров',status:'active',source:'fafa',pinned:false,phone:'+7 701 234 5678'},
+  {id:2,from:'Алматы',to:'Шымкент',cargo:'Продукты питания',body:'Рефрижератор',weight:18,price:380000,date:'25.01',driver:'Азат Берков',status:'active',source:'della',pinned:true,phone:'+7 702 345 6789'},
+  {id:3,from:'Актобе',to:'Астана',cargo:'Металлопрокат',body:'Тралл',weight:35,price:890000,date:'27.01',driver:'Дамир Алиев',status:'transit',source:'atisu',pinned:false,phone:'+7 703 456 7890'},
+  {id:4,from:'Шымкент',to:'Актау',cargo:'Химикаты',body:'Тент',weight:15,price:1200000,date:'26.01',driver:null,status:'free',source:'lardi',pinned:false,phone:'+7 705 567 8901'},
+  {id:5,from:'Павлодар',to:'Алматы',cargo:'Оборудование',body:'Мега',weight:22,price:680000,date:'28.01',driver:'Нурлан Сейт',status:'active',source:'fafa',pinned:false,phone:'+7 707 678 9012'},
+  {id:6,from:'Астана',to:'Актау',cargo:'Авто запчасти',body:'Тент',weight:8,price:1450000,date:'29.01',driver:null,status:'free',source:'fafa',pinned:false,phone:'+7 708 789 0123'},
+  {id:7,from:'Алматы',to:'Костанай',cargo:'Мебель',body:'Джамбо',weight:12,price:760000,date:'26.01',driver:'Расул Омаров',status:'transit',source:'della',pinned:false,phone:'+7 700 890 1234'},
+  {id:8,from:'Тараз',to:'Астана',cargo:'Зерно',body:'Бортовой',weight:40,price:430000,date:'27.01',driver:null,status:'free',source:'atisu',pinned:false,phone:'+7 701 901 2345'},
+];
+let nextLoadId = 9;
+
+let drivers = [
+  {id:1,name:'Серик Нуров',phone:'+7 701 234 5678',truck:'Тент 20т',status:'В рейсе',route:'Астана → Алматы',color:'#f97316'},
+  {id:2,name:'Азат Берков',phone:'+7 702 345 6789',truck:'Рефрижератор',status:'В рейсе',route:'Алматы → Шымкент',color:'#38bdf8'},
+  {id:3,name:'Дамир Алиев',phone:'+7 703 456 7890',truck:'Тралл 40т',status:'В рейсе',route:'Актобе → Астана',color:'#4ade80'},
+  {id:4,name:'Нурлан Сейт',phone:'+7 707 678 9012',truck:'Мега 24т',status:'В рейсе',route:'Павлодар → Алматы',color:'#a78bfa'},
+  {id:5,name:'Расул Омаров',phone:'+7 700 890 1234',truck:'Джамбо 24т',status:'В рейсе',route:'Алматы → Костанай',color:'#facc15'},
+  {id:6,name:'Кайрат Жаков',phone:'+7 705 111 2233',truck:'Тент 20т',status:'Свободен',route:'—',color:'#fb923c'},
+  {id:7,name:'Асет Болат',phone:'+7 702 222 3344',truck:'Газель 3т',status:'Свободен',route:'—',color:'#f87171'},
+  {id:8,name:'Ерлан Кожа',phone:'+7 701 333 4455',truck:'Рефрижератор',status:'Отдых',route:'—',color:'#34d399'},
+];
+let nextDriverId = 9;
+
+let vehicles = [
+  {id:1,plate:'177 YYY 01',type:'Тент',brand:'Volvo FH',driver:'Серик Нуров',route:'Астана → Алматы',status:'В рейсе'},
+  {id:2,plate:'085 BBB 05',type:'Рефрижератор',brand:'Mercedes Actros',driver:'Азат Берков',route:'Алматы → Шымкент',status:'В рейсе'},
+  {id:3,plate:'222 KAZ 11',type:'Тралл',brand:'MAN TGA',driver:'Дамир Алиев',route:'Актобе → Астана',status:'В рейсе'},
+  {id:4,plate:'310 AAL 17',type:'Мега',brand:'Scania R',driver:'Нурлан Сейт',route:'Павлодар → Алматы',status:'В рейсе'},
+  {id:5,plate:'091 CCC 02',type:'Тент',brand:'DAF XF',driver:'Кайрат Жаков',route:'—',status:'Свободен'},
+  {id:6,plate:'444 DDD 01',type:'Газель',brand:'ГАЗ 2834',driver:'Асет Болат',route:'—',status:'Свободен'},
+  {id:7,plate:'055 EEE 15',type:'Рефрижератор',brand:'Iveco Stralis',driver:'Ерлан Кожа',route:'—',status:'ТО'},
+];
+let nextVehicleId = 8;
+
+const ACTIVITY = [
+  {text:'Груз Астана→Алматы принят',time:'10:45',color:'#f97316'},
+  {text:'Серик Нуров выехал из Астаны',time:'09:30',color:'#4ade80'},
+  {text:'Расчёт цены: Актобе→Атырау — 450 000 ₸',time:'09:05',color:'#38bdf8'},
+  {text:'Новый груз добавлен: Химикаты, Шымкент→Актау',time:'08:55',color:'#a78bfa'},
+  {text:'Водитель Расул Омаров отметил отгрузку',time:'08:30',color:'#4ade80'},
+  {text:'Обновлён статус ТС 055 EEE 15 → ТО',time:'вчера',color:'#facc15'},
+];
+
+const PLATFORMS = {
+  exchanges:[
+    {name:'FA-FA.kz',url:'https://fa-fa.kz',desc:'Крупнейшая биржа грузов и транспорта Казахстана. Тысячи актуальных объявлений ежедневно.',cat:'Биржа КЗ',color:'#f97316',bg:'rgba(249,115,22,0.12)'},
+    {name:'DELLA.kz',url:'https://www.della.kz',desc:'Поиск грузов и транспорта. Удобный поиск по маршрутам, датам и типу кузова.',cat:'Биржа КЗ',color:'#38bdf8',bg:'rgba(56,189,248,0.12)'},
+    {name:'ATISU.kz',url:'https://atisu.kz',desc:'Биржа грузоперевозок Казахстана. Актуальные маршруты, быстрый поиск попутных грузов.',cat:'Биржа КЗ',color:'#4ade80',bg:'rgba(74,222,128,0.12)'},
+    {name:'ATI.SU',url:'https://ati.su',desc:'Крупнейшая биржа грузов и транспорта СНГ. Миллионы заявок, удобный поиск, верификация.',cat:'Биржа СНГ',color:'#a78bfa',bg:'rgba(167,139,250,0.12)'},
+    {name:'Lardi-Trans',url:'https://www.lardi-trans.com/ru/',desc:'Международная биржа грузоперевозок. Украина, Россия, СНГ, Европа.',cat:'Биржа СНГ',color:'#facc15',bg:'rgba(250,204,21,0.12)'},
+    {name:'Cargo.LT',url:'https://cargo.lt',desc:'Международная биржа грузоперевозок. Балтика, ЕС, СНГ. Профессиональный поиск.',cat:'Биржа EU',color:'#fb923c',bg:'rgba(251,146,60,0.12)'},
+  ],
+  maps:[
+    {name:'2ГИС',url:'https://2gis.kz',desc:'Карты городов Казахстана. Маршруты, пробки, справочник организаций, навигация.',cat:'Карты',color:'#4ade80',bg:'rgba(74,222,128,0.12)'},
+    {name:'Google Maps',url:'https://maps.google.com',desc:'Спутниковые карты, маршруты для грузовиков, пробки, обзор дорог.',cat:'Карты',color:'#38bdf8',bg:'rgba(56,189,248,0.12)'},
+    {name:'Яндекс.Карты',url:'https://yandex.kz/maps/',desc:'Карты и навигация с учётом пробок. Маршруты по Казахстану и СНГ.',cat:'Карты',color:'#facc15',bg:'rgba(250,204,21,0.12)'},
+  ],
+  other:[
+    {name:'OLX.kz',url:'https://www.olx.kz/transport/',desc:'Объявления о транспорте, грузах и перевозках. Частные и корпоративные объявления.',cat:'Объявления',color:'#fb923c',bg:'rgba(251,146,60,0.12)'},
+    {name:'Avito',url:'https://www.avito.ru/rossiya/gruzoviki_i_spetstehnika',desc:'Грузовой транспорт, прицепы, спецтехника. Россия и СНГ.',cat:'Объявления',color:'#f87171',bg:'rgba(248,113,113,0.12)'},
+    {name:'WhatsApp',url:'https://web.whatsapp.com',desc:'Быстрая связь с водителями, клиентами и партнёрами.',cat:'Связь',color:'#4ade80',bg:'rgba(74,222,128,0.12)'},
+  ]
+};
+
+// ══════════════════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════════════════
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const pg = document.getElementById('page-'+name);
+  if (pg) pg.classList.add('active');
+  const items = document.querySelectorAll('.nav-item');
+  items.forEach(item => {
+    if (item.getAttribute('onclick') && item.getAttribute('onclick').includes("'"+name+"'")) {
+      item.classList.add('active');
+    }
+  });
+  closeSidebar();
+  window.scrollTo(0,0);
+  if (name==='drivers') renderDrivers();
+  if (name==='vehicles') renderVehicles();
+  if (name==='platforms') renderPlatforms();
+  if (name==='dashboard') renderDashboard();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════════════
+
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' toast-'+type : '');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════════════════════════════════
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openAddModal() { openModal('modal-add-load'); }
+function openDriverModal() { openModal('modal-add-driver'); }
+function openVehicleModal() { openModal('modal-add-vehicle'); }
+
+document.querySelectorAll('.modal-bg').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ══════════════════════════════════════════════════════════════════
+// LOADS – FREIGHT BOARD
+// ══════════════════════════════════════════════════════════════════
+
+const activeSites = new Set(['fafa','della','atisu','lardi']);
+
+function toggleSiteFilter(el) {
+  const s = el.dataset.site;
+  const isActive = activeSites.has(s);
+  if (isActive && activeSites.size > 1) {
+    activeSites.delete(s);
+    el.textContent = el.textContent.replace(' ✓','');
+    el.style.opacity = '.5';
+  } else if (!isActive) {
+    activeSites.add(s);
+    if (!el.textContent.includes('✓')) el.textContent += ' ✓';
+    el.style.opacity = '1';
+  }
+}
+
+const GOODS = ['Стройматериалы','Продукты питания','Оборудование','Металлопрокат','Мебель','Химикаты','Авто запчасти','Зерно','Текстиль','Электроника','Пиломатериалы','Щебень','Цемент','Стекло','Пластик'];
+const BODIES = ['Тент','Рефрижератор','Контейнер','Бортовой','Мега','Джамбо','Тралл'];
+const SITE_NAMES = {fafa:'FAFA.kz',della:'DELLA.kz',atisu:'ATISU.kz',lardi:'Lardi-Trans'};
+const SITE_URLS = {
+  fafa: (f,t)=>`https://fa-fa.kz/loads/?from=${encodeURIComponent(f)}&to=${encodeURIComponent(t)}`,
+  della:(f,t)=>`https://www.della.kz/search/?from=${encodeURIComponent(f)}&to=${encodeURIComponent(t)}`,
+  atisu:(f,t)=>`https://atisu.kz/search?from=${encodeURIComponent(f)}&to=${encodeURIComponent(t)}`,
+  lardi:(f,t)=>`https://www.lardi-trans.com/ru/search/?from=${encodeURIComponent(f)}&to=${encodeURIComponent(t)}`,
+};
+
+// Realistic price generator
+function genPrice(km, weightT, body) {
+  if (!km) return null;
+  const baseRate = km < 300 ? 420 : km < 600 ? 390 : km < 1000 ? 360 : km < 1500 ? 330 : km < 2000 ? 310 : 290;
+  const bodyM = {Тент:1,Рефрижератор:1.2,Контейнер:1.1,Бортовой:0.95,Мега:1.05,Джамбо:1.08,Тралл:1.35}[body]||1;
+  const weightM = weightT >= 20 ? 1 : weightT >= 10 ? 1.05 : 1.15;
+  const rand = 0.88 + Math.random() * 0.24;
+  return Math.round(baseRate * km * bodyM * weightM * rand / 1000) * 1000;
+}
+
+function generateDemoCards(from, to) {
+  const km = getKm(from, to);
+  const items = [];
+  activeSites.forEach(site => {
+    const count = Math.floor(Math.random()*3)+2;
+    for (let i = 0; i < count; i++) {
+      const weight = [3,5,10,15,18,20,22,24,40][Math.floor(Math.random()*9)];
+      const body = BODIES[Math.floor(Math.random()*BODIES.length)];
+      const cargo = GOODS[Math.floor(Math.random()*GOODS.length)];
+      const price = genPrice(km, weight, body);
+      const d = new Date(); d.setDate(d.getDate() + Math.floor(Math.random()*4));
+      const dateStr = d.toLocaleDateString('ru',{day:'numeric',month:'short'});
+      const url = SITE_URLS[site] ? SITE_URLS[site](from, to) : '#';
+      items.push({site, cargo, body, weight, price, km, date:dateStr, url, pinned:false, phone:null});
+    }
+  });
+  return items;
+}
+
+async function doSearch() {
+  const from = document.getElementById('fromCity').value.trim();
+  const to = document.getElementById('toCity').value.trim();
+  if (!from || !to) { showToast('Введи откуда и куда','error'); return; }
+
+  const wrap = document.getElementById('results-wrap');
+  const btn = document.getElementById('searchBtn');
+  btn.disabled = true;
+  wrap.innerHTML = `<div style="display:flex;align-items:center;gap:12px;padding:40px;color:var(--text2);justify-content:center"><div class="spinner"></div>Ищем грузы на площадках...</div>`;
+
+  await new Promise(r => setTimeout(r, 900 + Math.random()*500));
+  btn.disabled = false;
+
+  const km = getKm(from, to);
+  const items = generateDemoCards(from, to);
+
+  const filterBody = document.getElementById('filterBody').value;
+  const filterTonn = document.getElementById('filterTonn').value;
+  const sort = document.getElementById('sortLoads').value;
+
+  let filtered = items;
+  if (filterBody) filtered = filtered.filter(i => i.body === filterBody);
+  if (filterTonn) {
+    const [mn, mx] = filterTonn.split('-').map(Number);
+    filtered = filtered.filter(i => i.weight >= mn && i.weight <= mx);
+  }
+  if (sort === 'price-asc') filtered.sort((a,b) => (a.price||999e9)-(b.price||999e9));
+  if (sort === 'price-desc') filtered.sort((a,b) => (b.price||0)-(a.price||0));
+
+  const siteLinks = [...activeSites].map(s =>
+    `<a href="${SITE_URLS[s]?SITE_URLS[s](from,to):'#'}" target="_blank" rel="noopener" 
+       style="font-size:11px;padding:4px 10px;border-radius:6px;background:var(--bg3);color:var(--text2);text-decoration:none;border:1px solid var(--border)">
+       ${SITE_NAMES[s]} →
+     </a>`
+  ).join('');
+
+  wrap.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:12px;flex-wrap:wrap">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text2)">
+        ${filtered.length} объявлений · ${from} <span style="color:var(--accent)">→</span> ${to}${km?' · '+km.toLocaleString()+' км':''}
+      </span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${siteLinks}</div>
+    </div>
+    <div class="loads-grid">
+      ${filtered.length ? filtered.map((item,idx) => `
+        <div class="load-card ${item.pinned?'pinned':''}" id="demo-card-${idx}">
+          <span class="load-source src-${item.site}">${SITE_NAMES[item.site]}</span>
+          <div class="load-top">
+            <div class="load-route">
+              ${from}<span class="arrow">→</span>${to}
+              ${km?`<span style="font-size:12px;color:var(--text3);font-weight:400;margin-left:6px">${km.toLocaleString()} км</span>`:''}
+            </div>
+            <div class="load-price ${!item.price?'negotiable':''}">${item.price?item.price.toLocaleString('ru')+' ₸':'Договорная'}</div>
+          </div>
+          <div class="load-meta">
+            <span class="badge badge-blue">${item.weight} т</span>
+            <span class="badge badge-gray">${item.body}</span>
+            <span class="badge badge-gray">📅 ${item.date}</span>
+            ${item.price&&km?`<span class="badge badge-orange">${Math.round(item.price/item.weight).toLocaleString()} ₸/т</span>`:''}
+            ${item.price&&km?`<span class="badge badge-gray">${Math.round(item.price/km)} ₸/км</span>`:''}
+          </div>
+          <div class="load-actions">
+            <a href="${item.url}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">Открыть объявление →</a>
+            <button class="btn btn-ghost btn-sm" onclick="calcFromLoad('${from}','${to}')">🧮 Рассчитать цену</button>
+          </div>
+        </div>
+      `).join('') : `<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Нет результатов по фильтрам</div></div>`}
+    </div>
+    <div class="info-box info-box-warn" style="margin-top:12px">
+      ⚠ Показаны демо-данные для иллюстрации. Нажмите «Открыть объявление» для перехода на реальный поиск выбранной площадки.
+    </div>
+  `;
+}
+
+function calcFromLoad(from, to) {
+  document.getElementById('cFrom').value = from;
+  document.getElementById('cTo').value = to;
+  showPage('calc');
+  calcPrice();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SAVE LOAD (modal)
+// ══════════════════════════════════════════════════════════════════
+
+function saveLoad() {
+  const from = document.getElementById('m-from').value.trim();
+  const to = document.getElementById('m-to').value.trim();
+  const cargo = document.getElementById('m-cargo').value.trim();
+  if (!from || !to || !cargo) { showToast('Заполни Откуда, Куда и Груз','error'); return; }
+  const price = parseInt(document.getElementById('m-price').value) || 0;
+  const weight = parseFloat(document.getElementById('m-weight').value) || 20;
+  const body = document.getElementById('m-body').value;
+  const phone = document.getElementById('m-phone').value.trim();
+  const d = document.getElementById('m-date').value;
+  const dateStr = d ? new Date(d).toLocaleDateString('ru',{day:'numeric',month:'short'}) : 'Сегодня';
+
+  loads.unshift({id:nextLoadId++,from,to,cargo,body,weight,price,date:dateStr,driver:null,status:'free',source:'manual',pinned:false,phone});
+  document.getElementById('loads-count').textContent = loads.filter(l=>l.status==='active'||l.status==='free').length;
+
+  closeModal('modal-add-load');
+  showToast('Груз добавлен: '+from+' → '+to,'success');
+  renderDashboard();
+
+  // Clear
+  ['m-from','m-to','m-cargo','m-price','m-weight','m-phone','m-comment','m-date'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CALCULATOR
+// ══════════════════════════════════════════════════════════════════
+
+const TRUCK_MULTS = {tent:1,mega:1.08,ref:1.22,lowbed:1.38,container:1.12,gazelle:1.3,jumbo:1.1,flatbed:0.95};
+const TRUCK_LABELS = {tent:'Тент',mega:'Мега',ref:'Рефрижератор',lowbed:'Тралл',container:'Контейнеровоз',gazelle:'Газель',jumbo:'Джамбо',flatbed:'Платформа'};
+const CARGO_MULTS = {general:1,food:1.1,construction:0.95,metal:1.05,chemicals:1.35,oversized:1.45,grain:0.9,equipment:1.15,auto:1.2};
+const CARGO_LABELS = {general:'Генеральный',food:'Продукты',construction:'Стройматериалы',metal:'Металлопрокат',chemicals:'Химикаты/Опасный',oversized:'Негабарит',grain:'Зерно',equipment:'Оборудование',auto:'Авто/Спецтехника'};
+const REGION_MULTS = {short:1.15, mid:1.0, long:0.92, vlong:0.88};
+const MIN_PRICE = 80000; // ₸ minimum for any trip
+const DIESEL_PRICE = 220; // ₸ per litre
+const FUEL_PER_KM = 35;   // litres/100km for a loaded truck
+
+function baseRatePerKm(km) {
+  if (km < 200)  return 580;
+  if (km < 400)  return 480;
+  if (km < 700)  return 420;
+  if (km < 1000) return 380;
+  if (km < 1500) return 350;
+  if (km < 2200) return 320;
+  return 295;
+}
+
+function regionMult(km) {
+  if (km < 400)  return REGION_MULTS.short;
+  if (km < 900)  return REGION_MULTS.mid;
+  if (km < 2000) return REGION_MULTS.long;
+  return REGION_MULTS.vlong;
+}
+
+function overweightMult(truckType, weight) {
+  const caps = {tent:20,mega:24,ref:20,lowbed:40,container:22,gazelle:3,jumbo:24,flatbed:22};
+  const cap = caps[truckType] || 20;
+  if (weight <= cap) return 1;
+  return 1 + (weight - cap) / cap * 0.5;
+}
+
+function calcPrice() {
+  const from   = document.getElementById('cFrom').value.trim();
+  const to     = document.getElementById('cTo').value.trim();
+  const truck  = document.getElementById('cTruck').value;
+  const cargo  = document.getElementById('cCargoType').value;
+  const weight = parseFloat(document.getElementById('cWeight').value);
+  const urgM   = parseFloat(document.getElementById('cUrgency').value);
+  const dirM   = parseFloat(document.getElementById('cDirection').value);
+
+  document.getElementById('cWeightLabel').textContent = weight;
+
+  const km = getKm(from, to);
+  const totalEl    = document.getElementById('cTotal');
+  const rangeEl    = document.getElementById('cRange');
+  const breakdown  = document.getElementById('cBreakdown');
+  const fuelBlock  = document.getElementById('cFuelBlock');
+  const extraRates = document.getElementById('cExtraRates');
+
+  if (!km || !from || !to) {
+    totalEl.textContent = '— ₸';
+    rangeEl.textContent  = km===0&&from&&to ? 'Маршрут не найден в базе' : 'Введите маршрут';
+    breakdown.innerHTML  = '';
+    fuelBlock.style.display = 'none';
+    extraRates.innerHTML = '';
+    return;
+  }
+
+  const baseRate = baseRatePerKm(km);
+  const truckM   = TRUCK_MULTS[truck]  || 1;
+  const cargoM   = CARGO_MULTS[cargo]  || 1;
+  const regionM  = regionMult(km);
+  const owM      = overweightMult(truck, weight);
+
+  let price = baseRate * km * truckM * cargoM * regionM * owM * urgM * dirM;
+  price = Math.max(price, MIN_PRICE);
+  const rounded = Math.round(price / 1000) * 1000;
+
+  const rangeLow  = Math.round(rounded * 0.88 / 1000) * 1000;
+  const rangeHigh = Math.round(rounded * 1.12 / 1000) * 1000;
+
+  // Fuel
+  const fuelL    = Math.round(km * FUEL_PER_KM / 100);
+  const fuelCost = fuelL * DIESEL_PRICE;
+  const fuelPct  = Math.min(100, Math.round(fuelCost / rounded * 100));
+
+  totalEl.textContent = rounded.toLocaleString('ru') + ' ₸';
+  rangeEl.textContent = `${from} → ${to} · ${km.toLocaleString()} км · диапазон: ${rangeLow.toLocaleString('ru')} – ${rangeHigh.toLocaleString('ru')} ₸`;
+
+  breakdown.innerHTML = [
+    {lbl:'Расстояние', val: km.toLocaleString()+' км'},
+    {lbl:'Базовая ставка', val: baseRate.toLocaleString()+' ₸/км'},
+    {lbl:'Кузов ('+TRUCK_LABELS[truck]+')', val: truckM.toFixed(2)+'×'},
+    {lbl:'Тип груза ('+CARGO_LABELS[cargo]+')', val: cargoM.toFixed(2)+'×'},
+    {lbl:'Региональный коэф.', val: regionM.toFixed(2)+'×'},
+    {lbl:'Перегруз', val: owM.toFixed(2)+'×'},
+    {lbl:'Срочность', val: urgM.toFixed(2)+'×'},
+    {lbl:'Направление', val: dirM.toFixed(2)+'×'},
+    {lbl:'Итого', val: rounded.toLocaleString('ru')+' ₸', cls:'total'},
+  ].map(r=>`<div class="breakdown-item ${r.cls||''}"><span class="lbl">${r.lbl}</span><span class="val">${r.val}</span></div>`).join('');
+
+  fuelBlock.style.display = 'block';
+  document.getElementById('cFuelLiters').textContent = `~${fuelL.toLocaleString()} л дизеля`;
+  document.getElementById('cFuelCost').textContent = `~${fuelCost.toLocaleString('ru')} ₸`;
+  document.getElementById('cFuelFill').style.width = fuelPct + '%';
+
+  extraRates.innerHTML = [
+    {lbl:'Ставка за тонну', val: Math.round(rounded/weight).toLocaleString('ru')+' ₸'},
+    {lbl:'Ставка за км', val: Math.round(rounded/km).toLocaleString('ru')+' ₸'},
+    {lbl:'Топливо / Итого', val: fuelPct+'%'},
+    {lbl:'Вес груза', val: weight+' т'},
+  ].map(r=>`
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:4px">${r.lbl}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--accent2)">${r.val}</div>
+    </div>
+  `).join('');
+}
+
+function pickRoute() {
+  const v = document.getElementById('quickRoute').value;
+  if (!v) return;
+  const [a,b] = v.split(' — ');
+  document.getElementById('cFrom').value = a;
+  document.getElementById('cTo').value = b;
+  calcPrice();
+}
+
+// Populate quick routes
+(function() {
+  const seen = new Set();
+  const sel = document.getElementById('quickRoute');
+  Object.keys(ROUTES).forEach(k => {
+    const parts = k.split('-');
+    if (parts.length !== 2) return;
+    const key = parts.slice().sort().join(' — ');
+    if (!seen.has(key)) {
+      seen.add(key);
+      const o = document.createElement('option');
+      o.value = key; o.textContent = key + ' · '+ROUTES[k]+' км';
+      sel.appendChild(o);
+    }
+  });
+})();
+
+// ══════════════════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════════════════
+
+function renderDashboard() {
+  document.getElementById('today-date').textContent = new Date().toLocaleDateString('ru',{weekday:'long',day:'numeric',month:'long'});
+
+  const STATUS_BADGE = {
+    active:  '<span class="badge badge-orange">Активен</span>',
+    transit: '<span class="badge badge-blue">В пути</span>',
+    free:    '<span class="badge badge-green">Свободен</span>',
+    done:    '<span class="badge badge-gray">Завершён</span>',
+  };
+
+  const tbody = document.getElementById('dash-loads-table');
+  tbody.innerHTML = loads.slice(0,6).map(l => `
+    <tr onclick="showPage('loads')">
+      <td><span style="font-weight:600">${l.from}</span> <span style="color:var(--accent)">→</span> <span style="font-weight:600">${l.to}</span></td>
+      <td class="td-muted">${l.cargo}</td>
+      <td class="td-muted">${l.driver||'—'}</td>
+      <td>${STATUS_BADGE[l.status]||''}</td>
+      <td class="td-mono" style="color:var(--accent)">${l.price?l.price.toLocaleString('ru')+' ₸':'Договорная'}</td>
+    </tr>
+  `).join('');
+
+  const feed = document.getElementById('activity-feed');
+  feed.innerHTML = ACTIVITY.map(a => `
+    <div class="activity-item">
+      <div class="activity-dot" style="background:${a.color}"></div>
+      <div class="activity-content">
+        <div class="activity-text">${a.text}</div>
+        <div class="activity-time">${a.time}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// DRIVERS
+// ══════════════════════════════════════════════════════════════════
+
+let driverFilter = '';
+function filterDrivers(val) {
+  if (val !== undefined) driverFilter = val.toLowerCase();
+  const statusF = document.getElementById('driverStatusFilter').value;
+  const grid = document.getElementById('drivers-grid');
+  let filtered = drivers;
+  if (driverFilter) filtered = filtered.filter(d => d.name.toLowerCase().includes(driverFilter)||d.phone.includes(driverFilter));
+  if (statusF) filtered = filtered.filter(d => d.status === statusF);
+  grid.innerHTML = filtered.length ? filtered.map(d => `
+    <div class="driver-card">
+      <div class="driver-ava" style="background:${d.color};color:#000">${d.name[0]}</div>
+      <div class="driver-name">${d.name}</div>
+      <div class="driver-phone">${d.phone}</div>
+      <div style="margin-bottom:8px">
+        <span class="badge ${d.status==='В рейсе'?'badge-blue':d.status==='Свободен'?'badge-green':'badge-yellow'}">${d.status}</span>
+        ${d.route!=='—'?`<span style="font-size:11px;color:var(--text3);margin-left:6px">${d.route}</span>`:''}
+      </div>
+      <div class="driver-actions">
+        <a href="https://wa.me/${d.phone.replace(/\D/g,'')}" target="_blank" rel="noopener" class="btn btn-success btn-sm">💬 WA</a>
+        <a href="tel:${d.phone}" class="btn btn-outline btn-sm">📞 Звонок</a>
+        <button class="btn btn-ghost btn-sm" onclick="copyPhone('${d.phone}')">📋</button>
+      </div>
+    </div>
+  `).join('') : '<div class="empty" style="grid-column:1/-1"><div class="empty-icon">👤</div><div class="empty-text">Водители не найдены</div></div>';
+}
+
+function renderDrivers() { filterDrivers(); }
+
+function saveDriver() {
+  const name = document.getElementById('d-name').value.trim();
+  const phone = document.getElementById('d-phone').value.trim();
+  if (!name || !phone) { showToast('Введи имя и телефон','error'); return; }
+  const colors = ['#f97316','#38bdf8','#4ade80','#facc15','#a78bfa','#fb923c','#f87171','#34d399'];
+  drivers.push({
+    id: nextDriverId++, name, phone,
+    truck: document.getElementById('d-truck').value,
+    status: document.getElementById('d-status').value,
+    route: document.getElementById('d-route').value.trim() || '—',
+    color: colors[Math.floor(Math.random()*colors.length)]
+  });
+  closeModal('modal-add-driver');
+  showToast('Водитель добавлен: '+name,'success');
+  filterDrivers();
+}
+
+function copyPhone(phone) {
+  navigator.clipboard.writeText(phone).then(()=>showToast('Номер скопирован: '+phone,'success')).catch(()=>{});
+}
+
+// ══════════════════════════════════════════════════════════════════
+// VEHICLES
+// ══════════════════════════════════════════════════════════════════
+
+let vehicleFilter = '';
+function filterVehicles(val) {
+  if (val !== undefined) vehicleFilter = val.toLowerCase();
+  const tbody = document.getElementById('vehicles-table');
+  const STATUS_BADGE = {'В рейсе':'badge-blue','Свободен':'badge-green','ТО':'badge-yellow','Неисправен':'badge-red'};
+  const filtered = vehicleFilter ? vehicles.filter(v =>
+    v.plate.toLowerCase().includes(vehicleFilter)||
+    v.brand.toLowerCase().includes(vehicleFilter)||
+    v.driver.toLowerCase().includes(vehicleFilter)
+  ) : vehicles;
+
+  tbody.innerHTML = filtered.map(v => `
+    <tr>
+      <td><span class="td-mono" style="font-weight:600;color:var(--text)">${v.plate}</span></td>
+      <td><span class="badge badge-gray">${v.type}</span></td>
+      <td class="td-muted">${v.brand}</td>
+      <td class="td-muted">${v.driver}</td>
+      <td class="td-muted" style="font-size:12px">${v.route}</td>
+      <td><span class="badge ${STATUS_BADGE[v.status]||'badge-gray'}">${v.status}</span></td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-ghost btn-sm" onclick="changeVehicleStatus(${v.id})" title="Изменить статус">🔄</button>
+          <button class="btn btn-danger btn-sm" onclick="removeVehicle(${v.id})" title="Удалить">✕</button>
+        </div>
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text3)">Транспорт не найден</td></tr>';
+}
+
+function renderVehicles() { filterVehicles(); }
+
+function changeVehicleStatus(id) {
+  const v = vehicles.find(x=>x.id===id);
+  if (!v) return;
+  const states = ['В рейсе','Свободен','ТО','Неисправен'];
+  const next = states[(states.indexOf(v.status)+1)%states.length];
+  v.status = next;
+  showToast(`${v.plate}: статус → ${next}`);
+  filterVehicles();
+}
+
+function removeVehicle(id) {
+  vehicles = vehicles.filter(v=>v.id!==id);
+  filterVehicles();
+  showToast('ТС удалено');
+}
+
+function saveVehicle() {
+  const plate = document.getElementById('v-plate').value.trim();
+  const brand = document.getElementById('v-brand').value.trim();
+  if (!plate || !brand) { showToast('Введи номер и марку','error'); return; }
+  vehicles.push({
+    id: nextVehicleId++, plate, brand,
+    type: document.getElementById('v-body').value,
+    driver: document.getElementById('v-driver').value.trim() || '—',
+    route: '—', status: 'Свободен'
+  });
+  closeModal('modal-add-vehicle');
+  showToast('ТС добавлено: '+plate,'success');
+  filterVehicles();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PLATFORMS
+// ══════════════════════════════════════════════════════════════════
+
+function renderPlatforms() {
+  function makeCard(p) {
+    const initials = p.name.replace(/[^A-Za-zА-Яа-я0-9]/g,'').slice(0,3).toUpperCase();
+    return `
+      <div class="platform-card">
+        <div class="platform-header">
+          <div class="platform-logo" style="background:${p.bg};color:${p.color}">${initials}</div>
+          <div>
+            <div class="platform-name">${p.name}</div>
+            <div class="platform-url">${p.url.replace('https://','').replace('http://','')}</div>
+          </div>
+        </div>
+        <div class="platform-desc">${p.desc}</div>
+        <div class="platform-footer">
+          <span class="platform-cat">${p.cat}</span>
+          <a href="${p.url}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">Открыть →</a>
+        </div>
+      </div>
+    `;
+  }
+  document.getElementById('platforms-exchanges').innerHTML = PLATFORMS.exchanges.map(makeCard).join('');
+  document.getElementById('platforms-maps').innerHTML = PLATFORMS.maps.map(makeCard).join('');
+  document.getElementById('platforms-other').innerHTML = PLATFORMS.other.map(makeCard).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// GLOBAL SEARCH
+// ══════════════════════════════════════════════════════════════════
+
+function globalSearchFn() {
+  const q = document.getElementById('globalSearch').value.trim().toLowerCase();
+  if (!q) return;
+  // Try to navigate to matching page
+  if (['груз','биржа','freight','load'].some(k=>k.includes(q)||q.includes(k))) showPage('loads');
+  else if (['калькул','цена','price','расчет'].some(k=>k.includes(q)||q.includes(k))) showPage('calc');
+  else if (['водитель','driver'].some(k=>k.includes(q)||q.includes(k))) showPage('drivers');
+  else if (['транспорт','машин','vehicle','truck'].some(k=>k.includes(q)||q.includes(k))) showPage('vehicles');
+  else if (['площадка','сайт','platform'].some(k=>k.includes(q)||q.includes(k))) showPage('platforms');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+
+document.getElementById('fromCity').addEventListener('keydown',e=>{ if(e.key==='Enter') doSearch(); });
+document.getElementById('toCity').addEventListener('keydown',e=>{ if(e.key==='Enter') doSearch(); });
+
+// Set today date default in modal
+document.getElementById('m-date').valueAsDate = new Date();
+
+renderDashboard();
+renderPlatforms();
+calcPrice();
+</script>
+</body>
+</html>
